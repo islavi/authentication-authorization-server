@@ -1,33 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { IUser } from './users.interface';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from './users.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UsersService {
-
-  private readonly users: IUser[] = [
-    {
-      email: 'israel.lavi@gmail.com',
-      name: 'Israel Lavi',
-      password: '123456'
-    },
-    {
-      email: 'john.smith@gmail.com',
-      name: 'John Smith',
-      password: '123456'
-    },
-  ];
-
-  async findOne(email: string): Promise<IUser | undefined> {
-    return this.users.find(user => user.email === email);
-  }
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
   async validateUser(email: string, password: string): Promise<IUser | undefined> {
-    console.log(`[UsersService] validateUser, email: ${email}, password: ${password}`)
-    const user = this.users.find(user => user.email === email && user.password === password);
+    console.log(`[UsersService] validateUser, email: ${email}, password: ${password}`);
+    const user: IUser = await this.userModel.findOne({ email, password }, { password: 0, _id: 0 }).lean();
     if (user) {
-      console.log('[UsersService] validateUser: found user', user)
-      return { ...user, password: undefined }
+      console.log('[UsersService] validateUser: found user', user);
+      return { ...user };
     }
-    return undefined
+    return undefined;
   }
 }

@@ -1,4 +1,3 @@
-
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
@@ -9,14 +8,14 @@ export class ArticlesController {
 
   @Get('all')
   getAllArticles() {
-    console.log(`[ArticlesController] getAllArticles`)
+    console.log(`[ArticlesController] getAllArticles`);
     return this.articlesService.findAll();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('my')
   getMyArticles(@Req() req) {
-    console.log(`[ArticlesController] getMyArticles`, req.user.email)
+    console.log(`[ArticlesController] getMyArticles`, req.user.email);
     return this.articlesService.findByOwnerEmail(req.user.email);
   }
 }
